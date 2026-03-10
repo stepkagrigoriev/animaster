@@ -129,31 +129,51 @@ function animaster(){
         addMove : function(duration, translation){
             this._steps.push({
                 type : "move",
-                duration : duration,
-                translation : translation,
-            })
+                duration,
+                translation,
+            });
+            return this;
+        },
+        addScale : function(duration, ratio){
+            this._steps.push({
+                type : "scale",
+                duration,
+                ratio,
+            });
+            return this;
+        },
+        addFadeIn : function(duration){
+            this._steps.push({
+                type : "fadeIn",
+                duration,
+            });
+            return this;
+        },
+        addFadeOut : function(duration){
+            this._steps.push({
+                type : "fadeOut",
+                duration,
+            });
             return this;
         },
         move : function(element, duration, translation) {
-            element.style.transitionDuration = `${duration}ms`;
-            element.style.transform = getTransform(translation, null);
+            this.addMove(duration, translation);
+            this.play(element);
             return () => resetMoveAndScale(element);
         },
         scale : function(element, duration, ratio) {
-            element.style.transitionDuration =  `${duration}ms`;
-            element.style.transform = getTransform(null, ratio);
+            this.addScale(duration, ratio);
+            this.play(element);
             return () => resetMoveAndScale(element);
         },
         fadeIn : function(element, duration) {
-            element.style.transitionDuration = `${duration}ms`;
-            element.classList.remove('hide');
-            element.classList.add('show');
+            this.addFadeIn(duration);
+            this.play(element);
             return () => resetFadeIn(element);
         },
         fadeOut : function(element, duration) {
-            element.style.transitionDuration = `${duration}ms`;
-            element.classList.remove('show');
-            element.classList.add('hide');
+            this.addFadeOut(duration);
+            this.play(element);
             return () => resetFadeOut(element);
         },
         showAndHide: function(element, duration){
@@ -191,15 +211,31 @@ function animaster(){
                 let step = steps[ind];
                 switch (step.type){
                     case "move":
-                        this.move(element, step.duration, step.translation);
+                        element.style.transitionDuration = `${step.duration}ms`;
+                        element.style.transform = getTransform(step.translation, null);
+                        break;
+                    case "scale":
+                        element.style.transitionDuration = `${step.duration}ms`;
+                        element.style.transform = getTransform(null, step.ratio);
+                        break;
+                    case "fadeIn":
+                        element.style.transitionDuration = `${step.duration}ms`;
+                        element.classList.remove('hide');
+                        element.classList.add('show');
+                        break;
+                    case "fadeOut":
+                        element.style.transitionDuration = `${step.duration}ms`;
+                        element.classList.remove('show');
+                        element.classList.add('hide');
                         break;
                     default:
-                        break
+                        break;
                 }
                 ind++;
                 setTimeout(next, step.duration);
             }
             next();
+            this._steps = [];
         },
     }
 }
