@@ -1,7 +1,8 @@
 addListeners();
 
 function addListeners() {
-    animObj = animaster() 
+    animObj = animaster();
+    animationsHandler = {}
     document.getElementById('fadeInPlay')
         .addEventListener('click', function () {
             const block = document.getElementById('fadeInBlock');
@@ -41,11 +42,20 @@ function addListeners() {
     document.getElementById('heartBeatingPlay')
         .addEventListener('click', function () {
             const block = document.getElementById('heartBeatingBlock');
-            animObj.heartBeating(block, 1000);
+            if (animationsHandler.heartBeating) {
+                animationsHandler.heartBeating.stop();
+            }
+            animationsHandler.heartBeating = animObj.heartBeating(block, 1000);  
+        });
+    
+    document.getElementById('heartBeatingStop')
+        .addEventListener('click', function () {
+            if (animationsHandler.heartBeating) {
+                animationsHandler.heartBeating.stop();
+                animationsHandler.heartBeating = null;
+            }
         });
 }
-
-const ONE_DIVIDE_ONE_AND_FOUR = 1 / 1.4;
 
 function getTransform(translation, ratio) {
     const result = [];
@@ -87,8 +97,16 @@ function animaster(){
             setTimeout(() => this.fadeOut(element, 3 * duration / 5), 2 * duration / 5);
         },
         heartBeating : function(element, duration) {
-            setInterval(() => setTimeout(() => this.scale(element, duration / 2, 1.4), duration), duration);
-            setTimeout(() => setInterval(() => setTimeout(() => this.scale(element, duration / 2, ONE_DIVIDE_ONE_AND_FOUR), duration), duration), duration / 2);
+            this.scale(element, duration / 2, 1.4);
+            let isGrowing = false;
+            const id = setInterval(() => { 
+                this.scale(element, duration / 2, isGrowing ? 1.4 : 1 / 1.4);
+                isGrowing = !isGrowing;
+            }, duration / 2); 
+
+            return {
+                stop: () => clearInterval(id),
+            };        
         }
     }
 }
