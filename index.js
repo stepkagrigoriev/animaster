@@ -118,6 +118,15 @@ function animaster(){
         element.style.transitionDuration = null;
     }
     return {
+        _steps : [],
+        addMove : function(duration, translation){
+            this._steps.push({
+                type : "move",
+                duration : duration,
+                translation : translation,
+            })
+            return this;
+        },
         move : function(element, duration, translation) {
             element.style.transitionDuration = `${duration}ms`;
             element.style.transform = getTransform(translation, null);
@@ -146,7 +155,11 @@ function animaster(){
         },
         moveAndHide : function(element, duration, translation) {
             this.move(element, 2 * duration / 5, translation);
-            setTimeout(() => this.fadeOut(element, 3 * duration / 5), 2 * duration / 5);
+            const id = setTimeout(() => this.fadeOut(element, 3 * duration / 5), 2 * duration / 5);
+            return () => {
+                clearTimeout(id);
+
+            }
         },
         heartBeating : function(element, duration) {
             this.scale(element, duration / 2, 1.4);
@@ -159,6 +172,26 @@ function animaster(){
             return {
                 stop: () => clearInterval(id),
             };        
-        }
+        },
+        play : function(element) {
+            let ind = 0;
+            const steps = this._steps;
+            const next = function(){
+                if (ind >= steps.length){
+                    return;
+                }
+                let step = steps[ind];
+                switch (step.type){
+                    case "move":
+                        this.move(element, step.duration, step.translation);
+                        break;
+                    default:
+                        break
+                }
+                ind++;
+                setTimeout(next, step.duration);
+            }
+            next();
+        },
     }
 }
