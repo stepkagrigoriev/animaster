@@ -8,6 +8,12 @@ function addListeners() {
             animObj.fadeIn(block, 5000);
         });
 
+    document.getElementById('fadeOutPlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('fadeOutBlock');
+            animObj.fadeOut(block, 5000);
+        });
+
     document.getElementById('movePlay')
         .addEventListener('click', function () {
             const block = document.getElementById('moveBlock');
@@ -78,9 +84,14 @@ function animaster(){
             element.style.transform = getTransform(null, ratio);
         },
         fadeIn : function(element, duration) {
-            element.style.transitionDuration =  `${duration}ms`;
+            element.style.transitionDuration = `${duration}ms`;
             element.classList.remove('hide');
             element.classList.add('show');
         },
+        fadeOut : function(element, duration) {
+            element.style.transitionDuration = `${duration}ms`;
+            element.classList.remove('show');
+            element.classList.add('hide');
+        }
     }
 }
