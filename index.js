@@ -31,7 +31,15 @@ function addListeners() {
             const block = document.getElementById('moveAndHideBlock');
             animObj.moveAndHide(block, 3000, {x : 100, y : -20});
         });
+
+    document.getElementById('heartBeatingPlay')
+        .addEventListener('click', function () {
+            const block = document.getElementById('heartBeatingBlock');
+            animObj.heartBeating(block, 1000);
+        });
 }
+
+const ONE_DIVIDE_ONE_AND_FOUR = 1 / 1.4;
 
 function getTransform(translation, ratio) {
     const result = [];
@@ -67,6 +75,10 @@ function animaster(){
         moveAndHide : function(element, duration, translation) {
             this.move(element, 2 * duration / 5, translation);
             setTimeout(() => this.fadeOut(element, 3 * duration / 5), 2 * duration / 5);
+        },
+        heartBeating : function(element, duration) {
+            setInterval(() => setTimeout(() => this.scale(element, duration / 2, 1.4), duration), duration);
+            setTimeout(() => setInterval(() => setTimeout(() => this.scale(element, duration / 2, ONE_DIVIDE_ONE_AND_FOUR), duration), duration), duration / 2);
         }
     }
 }
